@@ -30,7 +30,7 @@ interface HeroSection {
     trailerUrl?: string;
     type: string;
     category: string;
-    rating: string;
+    rating: any; // accept string | { average: number; count?: number }
   };
   backgroundImage?: string;
   backgroundVideo?: string;
@@ -52,7 +52,16 @@ interface Content {
   trailerUrl?: string;
   type: string;
   category: string;
-  rating: string;
+  rating: any; // accept string | { average: number; count?: number }
+}
+
+function formatRating(r: any): string {
+  if (r == null) return 'N/A';
+  if (typeof r === 'object') {
+    const avg = (r as any).average;
+    return typeof avg === 'number' || typeof avg === 'string' ? String(avg) : 'N/A';
+  }
+  return String(r);
 }
 
 export default function HeroSectionPage() {
@@ -265,9 +274,7 @@ export default function HeroSectionPage() {
                   <div className="flex items-center space-x-4 mb-4">
                     <span className="text-green-400 text-sm font-semibold">98% Match</span>
                     <span className="text-gray-400 text-sm">
-                      {typeof heroSections[currentSlide].content.rating === 'object' 
-                        ? heroSections[currentSlide].content.rating.average || 'N/A'
-                        : heroSections[currentSlide].content.rating}
+                      {formatRating(heroSections[currentSlide].content.rating)}
                     </span>
                     <span className="text-gray-400 text-sm">{heroSections[currentSlide].content.category}</span>
                     <span className="text-gray-400 text-sm">{heroSections[currentSlide].content.type}</span>
@@ -391,9 +398,7 @@ export default function HeroSectionPage() {
                 <div className="flex items-center space-x-6 mb-6">
                   <span className="text-green-400 text-lg font-semibold">98% Match</span>
                   <span className="text-gray-400">
-                    {typeof heroSections[currentSlide].content.rating === 'object' 
-                      ? heroSections[currentSlide].content.rating.average || 'N/A'
-                      : heroSections[currentSlide].content.rating}
+                    {formatRating(heroSections[currentSlide].content.rating)}
                   </span>
                   <span className="text-gray-400">{heroSections[currentSlide].content.category}</span>
                   <span className="text-gray-400">{heroSections[currentSlide].content.type}</span>
@@ -566,11 +571,7 @@ function HeroSectionFormModal({
                         <div className="flex-1">
                           <div className="font-medium">{item.title}</div>
                           <div className="text-gray-500 text-xs">
-                            {item.type} • {item.category} • {
-                              typeof item.rating === 'object' 
-                                ? item.rating.average || 'N/A'
-                                : item.rating
-                            }
+                            {item.type} • {item.category} • {formatRating(item.rating)}
                           </div>
                         </div>
                         <div className="text-xs text-gray-400">
@@ -596,11 +597,7 @@ function HeroSectionFormModal({
                   <div className="flex-1">
                     <div className="text-white font-medium text-sm mb-1">{selectedContent.title}</div>
                     <div className="text-netflix-text-gray text-xs mb-2">
-                      {selectedContent.type} • {selectedContent.category} • {
-                        typeof selectedContent.rating === 'object' 
-                          ? selectedContent.rating.average || 'N/A'
-                          : selectedContent.rating
-                      }
+                      {selectedContent.type} • {selectedContent.category} • {formatRating(selectedContent.rating)}
                     </div>
                     <div className="text-netflix-text-gray text-xs">
                       {selectedContent.backgroundThumbnailUrl ? '✓ Background image available' : '⚠ Using thumbnail as background'}
