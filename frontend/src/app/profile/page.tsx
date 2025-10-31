@@ -6,10 +6,18 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { UserCircleIcon, EnvelopeIcon, CalendarIcon, CreditCardIcon } from '@heroicons/react/24/outline';
 
+type Subscription = {
+  plan?: string;
+  status?: string;
+  endDate?: string | number | Date;
+  amount?: number;
+  interval?: string;
+};
+
 export default function ProfilePage() {
   const { user, loading } = useAuth();
   const router = useRouter();
-  const [subscription, setSubscription] = useState(null);
+  const [subscription, setSubscription] = useState<Subscription | null>(null);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -34,7 +42,7 @@ export default function ProfilePage() {
 
       if (response.ok) {
         const data = await response.json();
-        setSubscription(data.data.subscription);
+        setSubscription((data?.data?.subscription ?? null) as Subscription | null);
       }
     } catch (error) {
       console.error('Error fetching subscription:', error);
@@ -52,6 +60,11 @@ export default function ProfilePage() {
   if (!user) {
     return null;
   }
+
+  const planText = subscription?.plan ?? 'N/A';
+  const statusText = subscription?.status ?? 'unknown';
+  const nextBillingText = subscription?.endDate ? new Date(subscription.endDate).toLocaleDateString() : 'N/A';
+  const amountText = subscription?.amount != null ? `$${subscription.amount}/${subscription?.interval ?? ''}` : 'N/A';
 
   return (
     <div className="min-h-screen bg-dark-900">
@@ -111,25 +124,23 @@ export default function ProfilePage() {
                   <div className="space-y-4">
                     <div className="flex justify-between items-center">
                       <span className="text-gray-400">Plan:</span>
-                      <span className="text-white capitalize font-semibold">{subscription.plan}</span>
+                      <span className="text-white capitalize font-semibold">{planText}</span>
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-gray-400">Status:</span>
                       <span className={`capitalize font-semibold ${
-                        subscription.status === 'active' ? 'text-green-400' : 'text-red-400'
+                        statusText === 'active' ? 'text-green-400' : 'text-red-400'
                       }`}>
-                        {subscription.status}
+                        {statusText}
                       </span>
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-gray-400">Next Billing:</span>
-                      <span className="text-white">
-                        {new Date(subscription.endDate).toLocaleDateString()}
-                      </span>
+                      <span className="text-white">{nextBillingText}</span>
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-gray-400">Amount:</span>
-                      <span className="text-white">${subscription.amount}/{subscription.interval}</span>
+                      <span className="text-white">{amountText}</span>
                     </div>
                   </div>
                 ) : (
