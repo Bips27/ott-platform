@@ -83,6 +83,25 @@ cd frontend
 npm run dev
 ```
 
+## 🌐 Deploying Frontend to Netlify
+
+This repo includes a `netlify.toml` configured to deploy the Next.js frontend from `frontend/` using the official Netlify Next.js plugin.
+
+Basic steps:
+1. Push the repository to GitHub
+2. In Netlify, create a new site from Git and select this repo
+3. Build settings (auto-detected by `netlify.toml`):
+   - Base directory: `frontend`
+   - Build command: `npm ci && npm run build`
+   - Publish directory: `.next`
+4. Set frontend environment variables in Netlify UI:
+   - `NEXT_PUBLIC_API_URL` → your backend URL (e.g. `https://api.yourdomain.com/api`)
+   - Any other `NEXT_PUBLIC_*` vars as needed
+
+Notes:
+- The Express backend is not deployed on Netlify. Host it on a service like Render, Railway, Fly.io, or AWS, and point `NEXT_PUBLIC_API_URL` to it.
+- If you prefer proxying API calls via Netlify, add a redirect in `netlify.toml` mapping `/api/*` to your backend URL.
+
 ## 📖 Documentation
 
 - [API Documentation](./docs/api.md)
