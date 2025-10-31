@@ -109,10 +109,12 @@ export default function AccountPage() {
 
   const getSubscriptionStatus = () => {
     if (!user?.subscription) return { status: 'No Subscription', color: 'text-gray-400' };
-    
-    const isActive = user.subscription.status === 'active' && 
-                    new Date(user.subscription.endDate) > new Date();
-    
+
+    const endDateValue = user.subscription.endDate ?? null;
+    const hasValidEnd = endDateValue ? new Date(endDateValue as string | number | Date).getTime() > Date.now() : false;
+
+    const isActive = user.subscription.status === 'active' && hasValidEnd;
+
     if (isActive) {
       return { status: 'Active', color: 'text-green-400' };
     } else if (user.subscription.status === 'cancelled') {
@@ -247,13 +249,13 @@ export default function AccountPage() {
                   <div className="flex items-center space-x-2">
                     <CalendarIcon className="w-4 h-4" />
                     <span>
-                      Started: {new Date(user.subscription.startDate).toLocaleDateString()}
+                      Started: {new Date(user.subscription.startDate as string | number | Date).toLocaleDateString()}
                     </span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <CalendarIcon className="w-4 h-4" />
                     <span>
-                      {subscriptionStatus.status === 'Active' ? 'Renews' : 'Expires'}: {new Date(user.subscription.endDate).toLocaleDateString()}
+                      {subscriptionStatus.status === 'Active' ? 'Renews' : 'Expires'}: {user.subscription.endDate ? new Date(user.subscription.endDate as string | number | Date).toLocaleDateString() : 'N/A'}
                     </span>
                   </div>
                   <div className="flex items-center space-x-2">
