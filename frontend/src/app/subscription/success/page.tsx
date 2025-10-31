@@ -5,11 +5,17 @@ import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { CheckCircleIcon } from '@heroicons/react/24/solid';
 
+type Subscription = {
+  plan?: string;
+  status?: string;
+  endDate?: string | number | Date;
+};
+
 export default function SubscriptionSuccessPage() {
   const searchParams = useSearchParams();
   const sessionId = searchParams.get('session_id');
   const [isLoading, setIsLoading] = useState(true);
-  const [subscription, setSubscription] = useState(null);
+  const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -37,7 +43,7 @@ export default function SubscriptionSuccessPage() {
       const data = await response.json();
 
       if (data.success) {
-        setSubscription(data.data.subscription);
+        setSubscription((data?.data?.subscription ?? null) as Subscription | null);
       } else {
         setError(data.message || 'Failed to process subscription');
       }
@@ -82,6 +88,10 @@ export default function SubscriptionSuccessPage() {
     );
   }
 
+  const planText = subscription?.plan ?? 'N/A';
+  const statusText = subscription?.status ?? 'active';
+  const nextBillingText = subscription?.endDate ? new Date(subscription.endDate).toLocaleDateString() : 'N/A';
+
   return (
     <div className="min-h-screen bg-dark-900 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full">
@@ -104,16 +114,16 @@ export default function SubscriptionSuccessPage() {
               <div className="space-y-2 text-left">
                 <div className="flex justify-between">
                   <span className="text-gray-400">Plan:</span>
-                  <span className="text-white capitalize">{subscription.plan}</span>
+                  <span className="text-white capitalize">{planText}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-400">Status:</span>
-                  <span className="text-green-400 capitalize">{subscription.status}</span>
+                  <span className="text-green-400 capitalize">{statusText}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-400">Next Billing:</span>
                   <span className="text-white">
-                    {new Date(subscription.endDate).toLocaleDateString()}
+                    {nextBillingText}
                   </span>
                 </div>
               </div>
