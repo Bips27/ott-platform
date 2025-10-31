@@ -110,14 +110,14 @@ export default function AccountPage() {
   const getSubscriptionStatus = () => {
     if (!user?.subscription) return { status: 'No Subscription', color: 'text-gray-400' };
 
-    const endDateValue = user.subscription.endDate ?? null;
+    const endDateValue = (user.subscription as any).endDate ?? null;
     const hasValidEnd = endDateValue ? new Date(endDateValue as string | number | Date).getTime() > Date.now() : false;
 
-    const isActive = user.subscription.status === 'active' && hasValidEnd;
+    const isActive = (user.subscription as any).status === 'active' && hasValidEnd;
 
     if (isActive) {
       return { status: 'Active', color: 'text-green-400' };
-    } else if (user.subscription.status === 'cancelled') {
+    } else if ((user.subscription as any).status === 'cancelled') {
       return { status: 'Cancelled', color: 'text-red-400' };
     } else {
       return { status: 'Expired', color: 'text-yellow-400' };
@@ -154,6 +154,15 @@ export default function AccountPage() {
   }
 
   const subscriptionStatus = getSubscriptionStatus();
+
+  // Derive safe values for optional subscription fields
+  const startedOn = (user.subscription && 'startDate' in (user.subscription as any) && (user.subscription as any).startDate)
+    ? new Date((user.subscription as any).startDate as string | number | Date).toLocaleDateString()
+    : 'N/A';
+  const expiresOn = (user.subscription && (user.subscription as any).endDate)
+    ? new Date((user.subscription as any).endDate as string | number | Date).toLocaleDateString()
+    : 'N/A';
+  const autoRenew = Boolean(user.subscription && 'autoRenew' in (user.subscription as any) && (user.subscription as any).autoRenew);
 
   return (
     <div className="min-h-screen bg-netflix-black py-8">
@@ -217,7 +226,7 @@ export default function AccountPage() {
                   <CreditCardIcon className="w-6 h-6 text-gray-400" />
                   <div>
                     <p className="text-white font-medium">
-                      {user.subscription?.plan || 'No Plan'}
+                      {(user.subscription as any)?.plan || 'No Plan'}
                     </p>
                     <p className={`text-sm ${subscriptionStatus.color}`}>
                       {subscriptionStatus.status}
@@ -249,23 +258,23 @@ export default function AccountPage() {
                   <div className="flex items-center space-x-2">
                     <CalendarIcon className="w-4 h-4" />
                     <span>
-                      Started: {new Date(user.subscription.startDate as string | number | Date).toLocaleDateString()}
+                      Started: {startedOn}
                     </span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <CalendarIcon className="w-4 h-4" />
                     <span>
-                      {subscriptionStatus.status === 'Active' ? 'Renews' : 'Expires'}: {user.subscription.endDate ? new Date(user.subscription.endDate as string | number | Date).toLocaleDateString() : 'N/A'}
+                      {subscriptionStatus.status === 'Active' ? 'Renews' : 'Expires'}: {expiresOn}
                     </span>
                   </div>
                   <div className="flex items-center space-x-2">
-                    {user.subscription.autoRenew ? (
+                    {autoRenew ? (
                       <CheckCircleIcon className="w-4 h-4 text-green-400" />
                     ) : (
                       <XCircleIcon className="w-4 h-4 text-red-400" />
                     )}
                     <span>
-                      Auto-renewal: {user.subscription.autoRenew ? 'On' : 'Off'}
+                      Auto-renewal: {autoRenew ? 'On' : 'Off'}
                     </span>
                   </div>
                 </div>
