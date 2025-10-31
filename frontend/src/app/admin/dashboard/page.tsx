@@ -165,6 +165,9 @@ export default function AdminDashboard() {
     );
   }
 
+  const recentUsers = stats?.recentUsers ?? [];
+  const recentContent = stats?.recentContent ?? [];
+
   return (
     <div className="min-h-screen bg-netflix-black">
       <AdminSidebar />
@@ -232,8 +235,8 @@ export default function AdminDashboard() {
                 </a>
               </div>
               <div className="space-y-3">
-                {stats?.recentUsers?.length > 0 ? (
-                  stats.recentUsers.map((user: any) => (
+                {(recentUsers.length ?? 0) > 0 ? (
+                  (recentUsers as any[]).map((user: any) => (
                     <div key={user._id} className="flex items-center space-x-3">
                       <div className="w-8 h-8 bg-netflix-red rounded-full flex items-center justify-center">
                         <span className="text-white text-sm font-medium">
@@ -270,8 +273,8 @@ export default function AdminDashboard() {
                 </a>
               </div>
               <div className="space-y-3">
-                {stats?.recentContent?.length > 0 ? (
-                  stats.recentContent.map((content: Content) => (
+                {(recentContent.length ?? 0) > 0 ? (
+                  (recentContent as Content[]).map((content: Content) => (
                     <div key={content._id} className="flex items-center space-x-3">
                       <img 
                         className="w-12 h-8 object-cover rounded" 
