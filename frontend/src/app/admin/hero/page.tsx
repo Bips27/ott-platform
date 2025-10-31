@@ -513,7 +513,7 @@ function HeroSectionFormModal({
         ctaButton: {
           text: 'Play',
           action: 'play'
-        },
+        } as const,
         order: availableOrders[0] || 1,
         isActive: true,
         _id: hero?._id
