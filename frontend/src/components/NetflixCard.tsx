@@ -15,10 +15,19 @@ interface NetflixCardProps {
     type: 'movie' | 'series';
     duration?: string;
     episodes?: number;
-    rating: string;
+    rating: any; // accept string | { average?: number }
     category?: string;
   };
   size?: 'small' | 'medium' | 'large';
+}
+
+function formatRating(r: any): string {
+  if (r == null) return 'N/A';
+  if (typeof r === 'object') {
+    const avg = (r as any).average;
+    return typeof avg === 'number' || typeof avg === 'string' ? String(avg) : 'N/A';
+  }
+  return String(r);
 }
 
 export default function NetflixCard({ content, size = 'medium' }: NetflixCardProps) {
@@ -129,7 +138,7 @@ export default function NetflixCard({ content, size = 'medium' }: NetflixCardPro
                 <div className="flex items-center space-x-2">
                   <span className="text-green-400 font-semibold text-sm">98% Match</span>
                   <span className="border border-netflix-light-gray text-netflix-text-gray px-1 text-xs">
-                    {typeof content.rating === 'object' ? content.rating.average || 'N/A' : content.rating}
+                    {formatRating(content.rating)}
                   </span>
                 </div>
                 <span className="text-netflix-text-gray text-sm">
