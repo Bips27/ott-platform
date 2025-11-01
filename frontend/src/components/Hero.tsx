@@ -8,13 +8,22 @@ interface HeroProps {
   user?: any;
 }
 
+function formatRating(r: any): string {
+  if (r == null) return 'N/A';
+  if (typeof r === 'object') {
+    const avg = (r as any).average;
+    return typeof avg === 'number' || typeof avg === 'string' ? String(avg) : 'N/A';
+  }
+  return String(r);
+}
+
 export default function Hero({ user }: HeroProps) {
   const [isPlaying, setIsPlaying] = useState(false);
 
   const featuredContent = {
     title: "The Ultimate Adventure",
     description: "Embark on an epic journey through uncharted territories. Experience breathtaking visuals and heart-pounding action in this blockbuster adventure.",
-    rating: "PG-13",
+    rating: "PG-13" as any, // accept string | { average?: number }
     duration: "2h 15m",
     year: "2024",
     genre: "Adventure, Action"
@@ -53,7 +62,7 @@ export default function Hero({ user }: HeroProps) {
             
             <div className="flex items-center justify-center space-x-4 mb-4 text-sm text-gray-300">
               <span className="bg-green-600 text-white px-2 py-1 rounded text-xs font-medium">
-                {typeof featuredContent.rating === 'object' ? featuredContent.rating.average || 'N/A' : featuredContent.rating}
+                {formatRating(featuredContent.rating)}
               </span>
               <span>{featuredContent.year}</span>
               <span>{featuredContent.duration}</span>
