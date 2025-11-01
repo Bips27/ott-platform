@@ -14,12 +14,21 @@ interface ContentItem {
   type: 'movie' | 'series';
   duration?: string;
   episodes?: number;
-  rating: string;
+  rating: any; // accept string | { average: number; count?: number }
 }
 
 interface ContentGridProps {
   content: ContentItem[];
   loading: boolean;
+}
+
+function formatRating(r: any): string {
+  if (r == null) return 'N/A';
+  if (typeof r === 'object') {
+    const avg = (r as any).average;
+    return typeof avg === 'number' || typeof avg === 'string' ? String(avg) : 'N/A';
+  }
+  return String(r);
 }
 
 export default function ContentGrid({ content, loading }: ContentGridProps) {
@@ -127,7 +136,7 @@ export default function ContentGrid({ content, loading }: ContentGridProps) {
               <div className="flex items-center justify-between text-xs text-gray-400">
                 <div className="flex items-center space-x-2">
                   <span className="bg-green-600 text-white px-1 py-0.5 rounded text-xs">
-                    {typeof item.rating === 'object' ? item.rating.average || 'N/A' : item.rating}
+                    {formatRating(item.rating)}
                   </span>
                   <span>{item.type === 'movie' ? item.duration : `${item.episodes} Episodes`}</span>
                 </div>
@@ -147,7 +156,7 @@ export default function ContentGrid({ content, loading }: ContentGridProps) {
               <div className="flex items-center justify-between text-xs text-gray-400">
                 <span>{item.type === 'movie' ? item.duration : `${item.episodes} Episodes`}</span>
                 <span className="bg-green-600 text-white px-1 py-0.5 rounded">
-                  {typeof item.rating === 'object' ? item.rating.average || 'N/A' : item.rating}
+                  {formatRating(item.rating)}
                 </span>
               </div>
             </div>
